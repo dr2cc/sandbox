@@ -9,7 +9,7 @@ import (
 
 const (
 	network = "tcp"
-	port    = ":8080"
+	port    = "localhost:8080"
 )
 
 func main() {
@@ -39,6 +39,8 @@ func handleConnection(conn net.Conn) {
 	log.Printf("Подключен клиент %s\n", conn.RemoteAddr().String())
 
 	connReader := bufio.NewReader(conn)
+
+	//loop
 	for {
 		// Чтение данных из соединения
 		data, err := connReader.ReadString('\n')
@@ -49,10 +51,9 @@ func handleConnection(conn net.Conn) {
 		// Обработка сообщения от клиента
 		message := strings.TrimSpace(string(data))
 		log.Printf("Сообщение от %s: %s\n", conn.RemoteAddr().String(), message)
-		if message == "STOP" {
+		if message == "stop" {
 			break
 		}
-
 		// Отправка данных в соединение
 		conn.Write([]byte(data))
 	}
