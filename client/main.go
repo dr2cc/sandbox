@@ -5,34 +5,28 @@ import (
 	"fmt"
 	"net"
 	"os"
-	"strings"
 )
 
 const (
-	network = "tcp"
+	network = "udp"
 	port    = ":8080"
 )
 
 func main() {
-	// Преобразование сети и порта в TCP-адрес
-	tcpAddr, _ := net.ResolveTCPAddr(network, port)
+	// Преобразование сети и порта в UDP-адрес сервера
+	udpAddr, _ := net.ResolveUDPAddr(network, port)
 
-	// Создание соединения с сервером по TCP-адресу
-	conn, _ := net.DialTCP(network, nil, tcpAddr)
+	// Создание UDP-соединения
+	conn, _ := net.DialUDP(network, nil, udpAddr)
 	defer conn.Close()
 
 	reader := bufio.NewReader(os.Stdin)
-	connReader := bufio.NewReader(conn)
-
-	//loop
 	for {
-
-		fmt.Print("Сообщение серверу (или 'stop' для завершения): ")
+		fmt.Print("Сообщение серверу (или 'STOP' для завершения): ")
 
 		// Считывание сообщения из стандартного потока ввода
 		data, _ := reader.ReadString('\n')
-
-		if strings.TrimSpace(string(data)) == "stop" {
+		if data == "STOP\n" {
 			break
 		}
 
@@ -40,9 +34,8 @@ func main() {
 		conn.Write([]byte(data))
 
 		// Чтение данных из соединения
-		message, _ := connReader.ReadString('\n')
-
-		fmt.Print("Ответ от сервера: " + message)
-
+		buffer := make([]byte, 1024)
+		n, _, _ := conn.ReadFromUDP(buffer)
+		fmt.Printf("Ответ от сервера: %s", string(buffer[:n]))
 	}
 }
