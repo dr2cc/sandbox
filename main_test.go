@@ -14,7 +14,8 @@ func TestPizzasHandler(t *testing.T) {
 		input      *Pizzas
 		want       string
 		statusCode int
-	}{
+	}{ //А на неправильную конечную точку не проверяем.
+		//Может не надо? Не правильных точек бесконечнось..
 		{
 			name:       "without pizzas",
 			method:     http.MethodGet,
@@ -46,11 +47,15 @@ func TestPizzasHandler(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
-			request := httptest.NewRequest(tc.method, "/orders", nil)
+			//в оригинале здесь "/orders", но видимо имеет значение только "/"
+			request := httptest.NewRequest(tc.method, "/лвртмшгдерьмпдешу", nil)
 			responseRecorder := httptest.NewRecorder()
 
+			//Вызываем метод ServeHTTP структуры pizzasHandler
+			//Этот метод делает запись в responseRecorder
 			pizzasHandler{tc.input}.ServeHTTP(responseRecorder, request)
 
+			//А теперь проверяем, что мы в него написали:
 			if responseRecorder.Code != tc.statusCode {
 				t.Errorf("Want status '%d', got '%d'", tc.statusCode, responseRecorder.Code)
 			}
