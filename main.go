@@ -12,6 +12,7 @@ type Pizza struct {
 	Price int    `json:"price"`
 }
 
+// Пользовательский тип.
 type Pizzas []Pizza
 
 // func (ps Pizzas) FindByID(ID int) (Pizza, error) {
