@@ -78,18 +78,30 @@ type pizzasHandler struct {
 
 // здесь только Get - List all pizzas on the menu: GET `/pizzas“
 func (ph pizzasHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
+	// //Переделал оригинал, с использованием the named path wildcard (именованного подстановочного знака пути)
+	// //"/{id}"
+	// //Что-бы создать конечную точку, я теперь проверяю здесь соответствие полученного пути нашей конечной точке
+	// //Но пока (14.04.2025) не знаю как передать PathValue при тестировании.
+	// id := r.PathValue("id")
 
-	switch r.Method {
-	case http.MethodGet:
-		if len(*ph.pizzas) == 0 {
-			http.Error(w, "Error: No pizzas found", http.StatusNotFound)
-			return
+	// А вот RequestURI получается и от клиента и из теста
+	id := r.RequestURI
+	if id == "/pizzas" {
+		w.Header().Set("Content-Type", "application/json")
+
+		switch r.Method {
+		case http.MethodGet:
+			if len(*ph.pizzas) == 0 {
+				http.Error(w, "Error: No pizzas found", http.StatusNotFound)
+				return
+			}
+
+			json.NewEncoder(w).Encode(ph.pizzas)
+		default:
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		}
-
-		json.NewEncoder(w).Encode(ph.pizzas)
-	default:
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+	} else {
+		w.WriteHeader(http.StatusNotFound)
 	}
 }
 
@@ -115,7 +127,10 @@ func main() {
 	}
 
 	mux := http.NewServeMux()
-	mux.Handle("/pizzas", pizzasHandler{&pizzas})
+	// Так будет работать, но отдавать список пицц при обращеннии по любому адресу
+	// Сделал условие в обработчике
+	mux.Handle("/{id}", pizzasHandler{&pizzas})
+	//mux.Handle("/pizzas", pizzasHandler{&pizzas})
 	//mux.Handle("/orders", ordersHandler{&pizzas, &orders})
 
 	log.Fatal(http.ListenAndServe("localhost:8080", mux))

@@ -47,8 +47,8 @@ func TestPizzasHandler(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
-			//в оригинале здесь "/orders", но видимо имеет значение только "/"
-			request := httptest.NewRequest(tc.method, "/лвртмшгдерьмпдешу", nil)
+			//в оригинале здесь "/orders"
+			request := httptest.NewRequest(tc.method, "/pizzas", nil)
 			responseRecorder := httptest.NewRecorder()
 
 			//Вызываем метод ServeHTTP структуры pizzasHandler
