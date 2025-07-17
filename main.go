@@ -1,3 +1,7 @@
+//17.07.2025
+//Только GET по http://localhost:8080/pizzas
+//Возвращает список пицц
+
 package main
 
 import (
