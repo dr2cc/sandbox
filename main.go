@@ -68,6 +68,9 @@ func hello(w http.ResponseWriter, req *http.Request) {
 }
 
 func headers(w http.ResponseWriter, req *http.Request) {
+	ctx := req.Context()
+	fmt.Println("drk: heders started")
+	defer fmt.Println("drk: heders stopped")
 
 	for name, headers := range req.Header {
 		for _, h := range headers {
