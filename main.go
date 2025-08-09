@@ -47,7 +47,7 @@ func hello(w http.ResponseWriter, req *http.Request) {
 	// - Закрывается автоматически после указанного времени (10 * time.Second).
 	// - Не требует ручного создания или закрытия.
 	//
-	// Если через 10 секунд срабатывает time.After(), выполняется первая ветка
+	// Если действие (контекс) не отменено (к примеру Ctrl+C) то через 10 секунд срабатывает time.After(), выполняется первая ветка
 	case <-time.After(10 * time.Second):
 		fmt.Fprintf(w, "hello after ten sec\n")
 	//
@@ -56,7 +56,8 @@ func hello(w http.ResponseWriter, req *http.Request) {
 	// - Закрывается при отмене контекста (например, если клиент разорвал соединение).
 	// - Управляется самим контекстом, не требует вашего вмешательства.
 	//
-	// Если контекст отменяется раньше (клиент закрыл соединение), срабатывает ctx.Done()
+	// Если контекст отменяется раньше чем сработал time.After() (клиент закрыл соединение),
+	// срабатывает ctx.Done()
 	case <-ctx.Done():
 
 		err := ctx.Err()
@@ -68,14 +69,22 @@ func hello(w http.ResponseWriter, req *http.Request) {
 }
 
 func headers(w http.ResponseWriter, req *http.Request) {
+	// Этот эндпойнт из примера:
+	// https://gobyexample.com/http-server
+	// Но я в него добавил context и каналы!
 	ctx := req.Context()
 	fmt.Println("drk: heders started")
 	defer fmt.Println("drk: heders stopped")
 
-	for name, headers := range req.Header {
-		for _, h := range headers {
-			fmt.Fprintf(w, "%v: %v\n", name, h)
+	select {
+	case <-time.After(10 * time.Second):
+		for name, headers := range req.Header {
+			for _, h := range headers {
+				fmt.Fprintf(w, "%v: %v\n", name, h)
+			}
 		}
+	case <-ctx.Done():
+		fmt.Println("headers canceled")
 	}
 }
 
