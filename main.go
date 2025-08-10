@@ -23,12 +23,6 @@ import (
 // 	user     = "postgres"
 // 	password = "qwerty" //"yourpassword"
 // 	dbname   = "postgres"
-// 	//
-// 	//username = "postgres"
-// 	//host: "localhost"
-// 	//port: "5436"
-// 	//dbname: "postgres"
-// 	//sslmode = "disable"
 // )
 
 // DBConfig содержит параметры подключения к БД
