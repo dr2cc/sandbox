@@ -1,8 +1,5 @@
 package main
 
-// Строка запуска pg в docker
-//docker run --name=todo-db -e POSTGRES_PASSWORD=qwerty -p 5436:5432 -d --rm postgres
-
 import (
 	"context"
 	"database/sql"
@@ -95,12 +92,6 @@ func getEnv(key, defaultValue string) string {
 	return defaultValue
 }
 
-// // in git bash
-// export DB_HOST=localhost
-// export DB_USER=postgres
-// export DB_PASSWORD=qwerty
-// export DB_NAME=postgres
-
 func main() {
 	// Конфигурация БД
 	config := DBConfig{
@@ -151,3 +142,12 @@ func main() {
 		log.Fatalf("Ошибка сервера: %v", err)
 	}
 }
+
+// Строка запуска pg в docker
+//docker run --name=todo-db -e POSTGRES_PASSWORD=qwerty -p 5436:5432 -d --rm postgres
+
+// // in git bash
+// export DB_HOST=localhost
+// export DB_USER=postgres
+// export DB_PASSWORD=qwerty
+// export DB_NAME=postgres
