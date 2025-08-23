@@ -11,8 +11,13 @@ import (
 	_ "github.com/lib/pq"
 )
 
-// Константа подключения к БД (замените на свои реальные данные)
-const DATABASE_DSN = "postgres://user:password@localhost:5432/dbname?sslmode=disable"
+// Строка запуска контейнера в докере
+//docker run --name=todo-db -e POSTGRES_PASSWORD=qwerty -p 5436:5432 -d --rm postgres
+
+// // Константа подключения к БД (замените на свои реальные данные)
+// const DATABASE_DSN = "postgres://user:password@localhost:5432/dbname?sslmode=disable"
+
+const DATABASE_DSN = "postgres://postgres:qwerty@localhost:5436/postgres?sslmode=disable"
 
 func checkDBAvailability() bool {
 	db, err := sql.Open("postgres", DATABASE_DSN)
