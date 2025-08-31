@@ -4,63 +4,65 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"log"
-	"net/http"
 	"time"
 
-	_ "github.com/lib/pq"
+	_ "github.com/mattn/go-sqlite3"
 )
-
-// Строка запуска контейнера в докере
-//docker run --name=todo-db -e POSTGRES_PASSWORD=qwerty -p 5436:5432 -d --rm postgres
 
 // // Константа подключения к БД (замените на свои реальные данные)
 // const DATABASE_DSN = "postgres://user:password@localhost:5432/dbname?sslmode=disable"
 
-const DATABASE_DSN = "postgres://postgres:qwerty@localhost:5436/postgres?sslmode=disable"
+func getDesc(ctx context.Context, db *sql.DB, id string) (string, error) {
+	row := db.QueryRowContext(ctx,
+		"SELECT description FROM videos WHERE video_id = ?", id)
+	var desc sql.NullString
 
-func checkDBAvailability() bool {
-	db, err := sql.Open("postgres", DATABASE_DSN)
+	err := row.Scan(&desc)
 	if err != nil {
-		log.Printf("DB connection error: %v", err)
-		return false
+		return "", err
+	}
+	if desc.Valid {
+		return desc.String, nil
+	}
+	return "-----", nil
+}
+
+// Окончил на
+// Расширение поддерживаемых типов
+
+func main() {
+	db, err := sql.Open("sqlite3", "video.db")
+	if err != nil {
+		panic(err)
 	}
 	defer db.Close()
 
-	// Быстрая проверка соединения
-	db.SetMaxOpenConns(1)
-	db.SetConnMaxLifetime(time.Second)
+	//...
 
-	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	// не забываем освободить ресурс
 	defer cancel()
 
-	if err := db.PingContext(ctx); err != nil {
-		log.Printf("DB ping failed: %v", err)
-		return false
+	// // делаем запрос
+	// // QueryRowContext выполняет запрос, который, как ожидается, вернет не более одной строки (в нашем случае запрос:
+	// // ВЫБРАТЬ Количество(все) как count ИЗ videos
+	// // должен вернуть только одну строку- количество
+	// row := db.QueryRowContext(ctx,
+	// 	"SELECT COUNT(*) as count FROM videos")
+
+	row := db.QueryRowContext(ctx,
+		"SELECT title, views, channel_title "+
+			"FROM videos ORDER BY views DESC LIMIT 1")
+	var (
+		title string
+		views int
+		chati string
+	)
+	// порядок переменных должен соответствовать порядку колонок в запросе
+	err = row.Scan(&title, &views, &chati)
+	if err != nil {
+		panic(err)
 	}
-
-	return true
-}
-
-func main() {
-	dbAvailable := checkDBAvailability()
-	log.Printf("Database available: %v", dbAvailable)
-
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		status := fmt.Sprintf("Server is running\nDatabase available: %v", dbAvailable)
-		w.Write([]byte(status))
-	})
-
-	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
-		if dbAvailable {
-			w.WriteHeader(http.StatusOK)
-			w.Write([]byte("OK"))
-		} else {
-			w.WriteHeader(http.StatusServiceUnavailable)
-			w.Write([]byte("Database unavailable"))
-		}
-	})
-
-	log.Println("Starting server on :8080")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	//fmt.Println(getDesc(ctx, db, "0EbFotkXOiA"))
+	fmt.Printf("%s | %d | %s \r\n", title, views, chati)
 }
