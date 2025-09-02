@@ -31,6 +31,7 @@ func getDesc(ctx context.Context, db *sql.DB, id string) (string, error) {
 // Расширение поддерживаемых типов
 
 func main() {
+	// 1. подключение
 	db, err := sql.Open("sqlite3", "video.db")
 	if err != nil {
 		panic(err)
@@ -50,6 +51,7 @@ func main() {
 	// row := db.QueryRowContext(ctx,
 	// 	"SELECT COUNT(*) as count FROM videos")
 
+	// 2. получение данных
 	row := db.QueryRowContext(ctx,
 		"SELECT title, views, channel_title "+
 			"FROM videos ORDER BY views DESC LIMIT 1")
@@ -58,6 +60,8 @@ func main() {
 		views int
 		chati string
 	)
+
+	// 3. Scan() "переводит" полученные данные в GO-типы
 	// порядок переменных должен соответствовать порядку колонок в запросе
 	err = row.Scan(&title, &views, &chati)
 	if err != nil {
