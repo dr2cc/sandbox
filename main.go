@@ -9,23 +9,9 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-//Формат: postgres://user:password@host:port/dbname?sslmode=disable
-//в моем случае:
-//export DATABASE_DSN="postgres://postgres:qwerty@localhost:5436/postgres?sslmode=disable"
-
-//go run .\cmd\shortener\main.go
-//go run ./cmd/shortener/main.go
-
 // Строка запуска pg в docker
 //
-//docker run --name=todo-db -e POSTGRES_PASSWORD=qwerty -p 5432:5432 -d --rm postgres
-//
-// In this example:
-//  5432 (before the colon) is the port on your host machine that you want to expose (внешний порт, по нему осуществляем подключение с нашего компьютера).
-//  5432 (after the colon) is the container's internal port for PostgreSQL (внутренний порт контейнера для PostgreSQL)
-
-// // Константа подключения к БД (замените на свои реальные данные)
-// const DATABASE_DSN = "postgres://user:password@localhost:5432/dbname?sslmode=disable"
+//docker run -e POSTGRES_PASSWORD=qwerty -p 5432:5432 -v sprint3:/var/lib/postgresql/data -d postgres
 
 func getDesc(ctx context.Context, db *sql.DB, id string) (string, error) {
 	row := db.QueryRowContext(ctx,
