@@ -6,37 +6,30 @@ import (
 	"fmt"
 	"time"
 
-	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/lib/pq"
+	//_ "github.com/mattn/go-sqlite3"
 )
 
 // Строка запуска pg в docker
 //
 //docker run -e POSTGRES_PASSWORD=qwerty -p 5432:5432 -v sprint3:/var/lib/postgresql/data -d postgres
 
-func getDesc(ctx context.Context, db *sql.DB, id string) (string, error) {
-	row := db.QueryRowContext(ctx,
-		"SELECT description FROM videos WHERE video_id = ?", id)
-	var desc sql.NullString
-
-	err := row.Scan(&desc)
-	if err != nil {
-		return "", err
-	}
-	if desc.Valid {
-		return desc.String, nil
-	}
-	return "-----", nil
-}
-
-// Окончил на
-// Расширение поддерживаемых типов
-
 func main() {
-	// 1. подключение
-	db, err := sql.Open("sqlite3", "video.db")
+	// // 1. подключение
+
+	// //DriverName
+	dn := "postgres"
+	//dn := "sqlite3"
+
+	// // DataSourceName
+	dsn := "postgres://postgres:qwerty@localhost:5432/postgres?sslmode=disable"
+	//dsn := "sqlite.db"
+
+	db, err := sql.Open(dn, dsn)
 	if err != nil {
 		panic(err)
 	}
+	fmt.Println(dn)
 	defer db.Close()
 
 	//...
@@ -52,7 +45,7 @@ func main() {
 	// row := db.QueryRowContext(ctx,
 	// 	"SELECT COUNT(*) as count FROM videos")
 
-	// 2. получение данных
+	// 2. получение данных из таблицы videos (any db - pg or sqlite)
 	row := db.QueryRowContext(ctx,
 		"SELECT title, views, channel_title "+
 			"FROM videos ORDER BY views DESC LIMIT 1")
@@ -70,4 +63,19 @@ func main() {
 	}
 	//fmt.Println(getDesc(ctx, db, "0EbFotkXOiA"))
 	fmt.Printf("%s | %d | %s \r\n", title, views, chati)
+}
+
+func getDesc(ctx context.Context, db *sql.DB, id string) (string, error) {
+	row := db.QueryRowContext(ctx,
+		"SELECT description FROM videos WHERE video_id = ?", id)
+	var desc sql.NullString
+
+	err := row.Scan(&desc)
+	if err != nil {
+		return "", err
+	}
+	if desc.Valid {
+		return desc.String, nil
+	}
+	return "-----", nil
 }
