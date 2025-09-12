@@ -23,7 +23,7 @@ func main() {
 
 	// // DataSourceName
 	dsn := "postgres://postgres:qwerty@localhost:5432/postgres?sslmode=disable"
-	//dsn := "sqlite.db"
+	//dsn := "video.db"
 
 	db, err := sql.Open(dn, dsn)
 	if err != nil {
