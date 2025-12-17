@@ -2,68 +2,33 @@ package main
 
 import "fmt"
 
-type employer struct {
-	name    string
-	address string
-	salary  int
-}
-
-type customer struct {
-	name  string
-	email string
-}
-
-type creater interface {
-	// Метод create интерфейса creater
-	create(user string, info string)
-}
-
-func (e *employer) create(nick string, contact string) {
-	e.name = nick
-	e.address = contact
-	e.salary = 99999
-	fmt.Println("employer", *e)
-	fmt.Println("employer after clean", e.clean())
-}
-
-func (e employer) clean() employer {
-	e.name = ""
-	e.address = ""
-	e.salary = 0
-	return e
-}
-
-func (c *customer) create(nick string, contact string) {
-	c.name = nick
-	c.email = contact
-	fmt.Println("customer", *c)
-}
-
-func processCreator(c creater, name, data string) {
-	c.create(name, data)
-}
-
 func main() {
-	// создаю объекты типов employer и customer
-	empl := &employer{}
-	cust := &customer{}
+	fmt.Println(maxnumber([]int{2, 1, 6, 3, 8, 32, 16}))
+	fmt.Println(maxindex([]int{2, 1, 6, 3, 8, 32, 16}))
+}
 
-	// var _ creater = &employer{}      // employer реализует creater
-	// var _ creater = (*customer)(nil) // customer реализует creater
+func maxnumber(numbers []int) int {
+	var max int
 
-	//var c creater
+	for _, number := range numbers {
+		if number > max {
+			max = number
+		}
 
-	processCreator(empl, "Bob", "5 Avenue")
+	}
+	return max
+}
 
-	processCreator(cust, "Todd", "tt@gg.hhh")
+func maxindex(numbers []int) int {
+	var max int
+	var index int
 
-	// // employer реализует creater
-	// c = empl
-	// // реализуя такие же методы (поля объекта никак не связаны с интерфейсом)
-	// // другие методы у типа могут быть отличные от интерфейса!
-	// c.create("Bob", "5 Avenue")
+	for i, number := range numbers {
+		if number > max {
+			max = number
+			index = i
+		}
 
-	// c = cust
-	// c.create("Todd", "tt@gg.hhh")
-
+	}
+	return index
 }
