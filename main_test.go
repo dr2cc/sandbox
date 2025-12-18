@@ -25,6 +25,7 @@ func TestMax(t *testing.T) {
 	tests := []struct {
 		name string // description of this test case
 		// Named input parameters for target function.
+		// Именованные входные параметры для целевой функции.
 		numbers []int
 		want    int
 	}{
